@@ -1,6 +1,8 @@
 # XButtonMapper
 
 XButtonMapper 是一个适用于 Windows 10 21H2 的轻量托盘工具，用鼠标前进、后退侧键触发复制和粘贴。
+<img width="476" height="246" alt="image" src="https://github.com/user-attachments/assets/c2bc0868-0bf5-4d02-9c8f-809aebe3b4e1" />
+
 
 ## 直接运行
 
