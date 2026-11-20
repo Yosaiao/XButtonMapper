@@ -161,6 +161,7 @@ namespace XButtonMapper
             bool isBackButton)
         {
             AddActionItem(parent, itemMap, ButtonAction.Copy, "复制", isBackButton);
+            AddActionItem(parent, itemMap, ButtonAction.CopyWithInsert, "兼容复制 (Ctrl+Insert)", isBackButton);
             AddActionItem(parent, itemMap, ButtonAction.Paste, "粘贴", isBackButton);
             AddActionItem(parent, itemMap, ButtonAction.PassThrough, "保持原功能", isBackButton);
         }

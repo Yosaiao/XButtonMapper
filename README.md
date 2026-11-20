@@ -1,8 +1,14 @@
-# XButtonMapper
+# XButtonMapper 2.0
 
 XButtonMapper 是一个适用于 Windows 10 21H2 的轻量托盘工具，用鼠标前进、后退侧键触发复制和粘贴。
 <img width="476" height="246" alt="image" src="https://github.com/user-attachments/assets/c2bc0868-0bf5-4d02-9c8f-809aebe3b4e1" />
 
+
+## 2.0 更新
+
+新增可单独为侧键选择的“兼容复制 (Ctrl+Insert)”。如果 Coremail 4.0 中手动按 Ctrl+Insert 可以复制，可在托盘菜单中选择“后退键 → 兼容复制 (Ctrl+Insert)”并验证。升级时先从托盘退出旧版，再运行新版。已有设置会保留。
+
+复制和粘贴现在按前台窗口的键盘布局发送扫描码。
 
 ## 直接运行
 
@@ -17,7 +23,7 @@ XButtonMapper 是一个适用于 Windows 10 21H2 的轻量托盘工具，用鼠�
 右键托盘图标可以：
 
 - 临时启用或暂停映射
-- 为两个侧键分别选择“复制”“粘贴”或“保持原功能”
+- 为两个侧键分别选择“复制”“兼容复制 (Ctrl+Insert)”“粘贴”或“保持原功能”
 - 启用或关闭当前用户的开机自动启动
 - 退出程序
 
@@ -29,7 +35,7 @@ XButtonMapper 是一个适用于 Windows 10 21H2 的轻量托盘工具，用鼠�
 
 - `BackAction`：后退键动作
 - `ForwardAction`：前进键动作
-- 可用值：`Copy`、`Paste`、`PassThrough`
+- 可用值：`Copy`、`CopyWithInsert`、`Paste`、`PassThrough`
 
 启用“开机自动启动”后会写入：
 

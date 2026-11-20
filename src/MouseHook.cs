@@ -140,6 +140,10 @@ namespace XButtonMapper
         private static bool SendShortcut(ButtonAction action)
         {
             int virtualKey = action == ButtonAction.Copy ? NativeMethods.VK_C : NativeMethods.VK_V;
+            if (action == ButtonAction.CopyWithInsert)
+            {
+                virtualKey = NativeMethods.VK_INSERT;
+            }
             if (IsKeyDown(virtualKey))
             {
                 return false;
@@ -150,18 +154,20 @@ namespace XButtonMapper
                 IsKeyDown(NativeMethods.VK_RCONTROL);
 
             NativeMethods.INPUT[] inputs = new NativeMethods.INPUT[controlAlreadyDown ? 2 : 4];
+            uint thread = NativeMethods.GetWindowThreadProcessId(NativeMethods.GetForegroundWindow(), IntPtr.Zero);
+            IntPtr layout = NativeMethods.GetKeyboardLayout(thread);
             int index = 0;
             if (!controlAlreadyDown)
             {
-                inputs[index++] = CreateKeyboardInput(NativeMethods.VK_LCONTROL, false);
+                inputs[index++] = CreateKeyboardInput(NativeMethods.VK_LCONTROL, false, layout);
             }
 
-            inputs[index++] = CreateKeyboardInput(virtualKey, false);
-            inputs[index++] = CreateKeyboardInput(virtualKey, true);
+            inputs[index++] = CreateKeyboardInput(virtualKey, false, layout);
+            inputs[index++] = CreateKeyboardInput(virtualKey, true, layout);
 
             if (!controlAlreadyDown)
             {
-                inputs[index] = CreateKeyboardInput(NativeMethods.VK_LCONTROL, true);
+                inputs[index] = CreateKeyboardInput(NativeMethods.VK_LCONTROL, true, layout);
             }
 
             uint sent = NativeMethods.SendInput(
@@ -171,13 +177,13 @@ namespace XButtonMapper
 
             if (sent != inputs.Length)
             {
-                ReleasePartiallyInsertedKeys(sent, controlAlreadyDown, virtualKey);
+                ReleasePartiallyInsertedKeys(sent, controlAlreadyDown, virtualKey, layout);
             }
 
             return sent == inputs.Length;
         }
 
-        private static void ReleasePartiallyInsertedKeys(uint sent, bool controlAlreadyDown, int virtualKey)
+        private static void ReleasePartiallyInsertedKeys(uint sent, bool controlAlreadyDown, int virtualKey, IntPtr layout)
         {
             bool targetKeyMayBeDown = controlAlreadyDown ? sent >= 1 : sent >= 2;
             bool targetKeyUpWasInserted = controlAlreadyDown ? sent >= 2 : sent >= 3;
@@ -189,12 +195,12 @@ namespace XButtonMapper
 
             if (targetKeyMayBeDown && !targetKeyUpWasInserted)
             {
-                cleanup[cleanupCount++] = CreateKeyboardInput(virtualKey, true);
+                cleanup[cleanupCount++] = CreateKeyboardInput(virtualKey, true, layout);
             }
 
             if (synthesizedControlMayBeDown && !synthesizedControlUpWasInserted)
             {
-                cleanup[cleanupCount++] = CreateKeyboardInput(NativeMethods.VK_LCONTROL, true);
+                cleanup[cleanupCount++] = CreateKeyboardInput(NativeMethods.VK_LCONTROL, true, layout);
             }
 
             if (cleanupCount == 0)
@@ -215,14 +221,26 @@ namespace XButtonMapper
                 Marshal.SizeOf(typeof(NativeMethods.INPUT)));
         }
 
-        private static NativeMethods.INPUT CreateKeyboardInput(int virtualKey, bool keyUp)
+        internal static NativeMethods.INPUT CreateKeyboardInput(int virtualKey, bool keyUp, IntPtr layout)
         {
             NativeMethods.INPUT input = new NativeMethods.INPUT();
             input.type = NativeMethods.INPUT_KEYBOARD;
             input.data.ki = new NativeMethods.KEYBDINPUT();
             input.data.ki.wVk = unchecked((ushort)virtualKey);
-            input.data.ki.wScan = 0;
+            ushort scanCode = (ushort)NativeMethods.MapVirtualKeyEx((uint)virtualKey, NativeMethods.MAPVK_VK_TO_VSC, layout);
+            input.data.ki.wScan = scanCode;
             input.data.ki.dwFlags = keyUp ? NativeMethods.KEYEVENTF_KEYUP : 0;
+            if (virtualKey == NativeMethods.VK_INSERT)
+            {
+                // The dedicated Insert key uses the extended form of the keypad scan code.
+                input.data.ki.dwFlags |= NativeMethods.KEYEVENTF_EXTENDEDKEY;
+            }
+            if (scanCode != 0)
+            {
+                input.data.ki.wVk = 0;
+                input.data.ki.dwFlags |= NativeMethods.KEYEVENTF_SCANCODE;
+            }
+
             input.data.ki.time = 0;
             input.data.ki.dwExtraInfo = InputMarker;
             return input;

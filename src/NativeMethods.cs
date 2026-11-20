@@ -13,6 +13,23 @@ namespace XButtonMapper
         internal const uint XBUTTON1 = 0x0001;
         internal const uint XBUTTON2 = 0x0002;
         internal const uint INPUT_KEYBOARD = 1;
+        internal const uint KEYEVENTF_SCANCODE = 0x0008;
+        internal const uint KEYEVENTF_EXTENDEDKEY = 0x0001;
+        internal const int VK_INSERT = 0x2D;
+        internal const uint MAPVK_VK_TO_VSC = 0;
+
+        [DllImport("user32.dll")]
+        internal static extern IntPtr GetForegroundWindow();
+
+        [DllImport("user32.dll")]
+        internal static extern uint GetWindowThreadProcessId(IntPtr window, IntPtr processId);
+
+        [DllImport("user32.dll")]
+        internal static extern IntPtr GetKeyboardLayout(uint threadId);
+
+        [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+        internal static extern uint MapVirtualKeyEx(uint code, uint mapType, IntPtr layout);
+
         internal const uint KEYEVENTF_KEYUP = 0x0002;
         internal const int VK_LCONTROL = 0xA2;
         internal const int VK_RCONTROL = 0xA3;

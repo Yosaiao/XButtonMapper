@@ -10,7 +10,8 @@ namespace XButtonMapper
     {
         Copy,
         Paste,
-        PassThrough
+        PassThrough,
+        CopyWithInsert
     }
 
     internal sealed class AppSettings
